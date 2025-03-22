@@ -10,6 +10,12 @@ MCPXcode is an open-source implementation of the [Model Context Protocol (MCP)](
 Following the MCP specification, this project creates a bridge between Xcode's development environment and AI tools, allowing for enhanced developer workflows through contextual understanding and programmable interactions. It wraps common command-line tools (`xcrun`, `xctrace`) and leverages macOS accessibility features to enable AI-assisted automation of Xcode operations.
 
 
+## Screenshot
+
+<p align="center">
+  <img src="assets/screenshot1.png" width="49%" />
+  <img src="assets/screenshot2.png" width="49%" />
+</p>
 
 
 ## Installation
