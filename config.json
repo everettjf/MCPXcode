@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "MCPXcode": {
+      "command": "uv",
+      "args": [
+        "--directory",
+        "<Path>/MCPXcode",
+        "run",
+        "main.py"
+      ]
+    }
+  }
+}
