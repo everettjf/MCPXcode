@@ -1,7 +1,7 @@
 [project]
 name = "mcpxcode"
 version = "0.1.0"
-description = "Add your description here"
+description = "MCPXcode is an open-source implementation of the Model Context Protocol (MCP) for Xcode."
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
