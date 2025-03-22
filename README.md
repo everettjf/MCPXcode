@@ -13,8 +13,8 @@ Following the MCP specification, this project creates a bridge between Xcode's d
 ## Screenshot
 
 <p align="center">
-  <img src="assets/screenshot1.png" width="49%" />
-  <img src="assets/screenshot2.png" width="49%" />
+  <img src="assets/screenshot01.png" width="49%" />
+  <img src="assets/screenshot02.png" width="49%" />
 </p>
 
 
