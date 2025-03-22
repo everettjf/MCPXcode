@@ -116,5 +116,104 @@ async def launch_app(device_id: str, bundle_id: str) -> str:
         raise Exception(f"Failed to launch app: {e.stderr}")
 
 
+@mcp.tool()
+async def get_sdk_path() -> str:
+    """Get the path of the current SDK.
+    
+    Returns:
+        str: Path to the current SDK
+    """
+    try:
+        result = subprocess.run(
+            ["xcrun", "--show-sdk-path"],
+            capture_output=True,
+            text=True,
+            check=True
+        )
+        return result.stdout.strip()
+    except subprocess.CalledProcessError as e:
+        raise Exception(f"Failed to get SDK path: {e.stderr}")
+
+@mcp.tool()
+async def get_sdk_version() -> str:
+    """Get the version of the current SDK.
+    
+    Returns:
+        str: Version of the current SDK
+    """
+    try:
+        result = subprocess.run(
+            ["xcrun", "--show-sdk-version"],
+            capture_output=True,
+            text=True,
+            check=True
+        )
+        return result.stdout.strip()
+    except subprocess.CalledProcessError as e:
+        raise Exception(f"Failed to get SDK version: {e.stderr}")
+
+@mcp.tool()
+async def get_sdk_platform_path() -> str:
+    """Get the platform path of the current SDK.
+    
+    Returns:
+        str: Platform path of the current SDK
+    """
+    try:
+        result = subprocess.run(
+            ["xcrun", "--show-sdk-platform-path"],
+            capture_output=True,
+            text=True,
+            check=True
+        )
+        return result.stdout.strip()
+    except subprocess.CalledProcessError as e:
+        raise Exception(f"Failed to get SDK platform path: {e.stderr}")
+
+@mcp.tool()
+async def find_developer_tool(tool_name: str) -> str:
+    """Find the path of a developer tool.
+    
+    Args:
+        tool_name (str): Name of the developer tool to find
+        
+    Returns:
+        str: Full path to the developer tool
+    """
+    try:
+        result = subprocess.run(
+            ["xcrun", "-f", tool_name],
+            capture_output=True,
+            text=True,
+            check=True
+        )
+        return result.stdout.strip()
+    except subprocess.CalledProcessError as e:
+        raise Exception(f"Failed to find tool {tool_name}: {e.stderr}")
+
+@mcp.tool()
+async def run_tool_with_sdk(tool_name: str, sdk_name: str, *args: str) -> str:
+    """Run a developer tool with a specific SDK.
+    
+    Args:
+        tool_name (str): Name of the developer tool to run
+        sdk_name (str): Name of the SDK to use (e.g., 'iphoneos', 'macosx')
+        *args: Additional arguments to pass to the tool
+        
+    Returns:
+        str: Output from the tool
+    """
+    try:
+        cmd = ["xcrun", "--sdk", sdk_name, tool_name] + list(args)
+        result = subprocess.run(
+            cmd,
+            capture_output=True,
+            text=True,
+            check=True
+        )
+        return result.stdout
+    except subprocess.CalledProcessError as e:
+        raise Exception(f"Failed to run {tool_name} with SDK {sdk_name}: {e.stderr}")
+
 if __name__ == "__main__":
     mcp.run(transport='stdio')
