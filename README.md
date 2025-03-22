@@ -6,6 +6,46 @@ MCPXcode is an open-source implementation of the [Model Context Protocol (MCP)](
 
 Following the MCP specification, this project creates a bridge between Xcode's development environment and AI tools, allowing for enhanced developer workflows through contextual understanding and programmable interactions. It wraps common command-line tools (`xcrun`, `xctrace`) and leverages macOS accessibility features to enable AI-assisted automation of Xcode operations.
 
+
+**This Project is in Active Development, So May Have Unexpected Issues**
+
+
+## Installation
+
+```bash
+
+# Install uv
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Clone the repository
+git clone https://github.com/everettjf/MCPXcode.git
+cd MCPXcode
+source .venv/bin/activate
+uv add "mcp[cli]"
+```
+
+## Config
+
+
+
+```json
+{
+  "mcpServers": {
+    "MCPXcode": {
+      "command": "uv", # may use full path
+      "args": [
+        "--directory",
+        "<Path>/MCPXcode", # change to your full path
+        "run",
+        "main.py"
+      ]
+    }
+  }
+}
+```
+
+
+
 ## Features
 
 ### Current MCP Tool Integrations
@@ -38,19 +78,6 @@ Following the MCP specification, this project creates a bridge between Xcode's d
   - Language-specific SDKs implementing the MCP specification
   - Simplified context exchange between AI assistants and Xcode
 
-## Installation
-
-```bash
-# Clone the repository
-git clone https://github.com/everettjf/MCPXcode.git
-cd MCPXcode
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Start the MCP server
-python -m mcpxcode.server
-```
 
 ## Usage
 
@@ -65,41 +92,6 @@ mcpxcode tool xcrun simctl list --format json
 
 # Execute an xctrace tool with context
 mcpxcode tool xctrace record --template 'Time Profiler' --launch com.example.app
-```
-
-### MCP Client API Examples
-
-```python
-from mcpxcode.client import MCPClient
-
-# Connect to the MCP server
-client = MCPClient(endpoint="http://localhost:8080")
-
-# Execute xcrun tool with context
-simulators = client.execute_tool(
-    name="xcrun.simctl.list",
-    context={"output_format": "json"}
-)
-
-# Execute xctrace tool with context
-trace_session = client.execute_tool(
-    name="xctrace.record", 
-    context={
-        "template": "Time Profiler",
-        "target_app": "com.example.app"
-    }
-)
-
-# Execute accessibility tools with semantic context
-client.execute_tool(
-    name="accessibility.click",
-    context={"element": "Run Button"}
-)
-
-client.execute_tool(
-    name="accessibility.wait_for",
-    context={"element": "Debug Navigator"}
-)
 ```
 
 ## Project Roadmap
@@ -126,22 +118,11 @@ client.execute_tool(
 - ⬜ Context-aware integration with AI-powered CI/CD tools
 - ⬜ Semantic context monitoring dashboard
 
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
 
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
-## Acknowledgements
+## Contributing
 
-- Apple Developer Documentation
-- The Xcode developer community
-- Contributors to similar open-source tools
+Contributions are welcome! Please feel free to submit a Pull Request.
