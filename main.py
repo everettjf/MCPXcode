@@ -1,7 +1,9 @@
-from typing import Any
+from typing import Any, Dict, List, Optional
 from mcp.server.fastmcp import FastMCP
 import json
 import subprocess
+from xctrace import list_devices as xctrace_list_devices
+from xctrace import list_templates, record, export
 mcp = FastMCP("MCPXcode")
 
 @mcp.tool()
@@ -214,6 +216,43 @@ async def run_tool_with_sdk(tool_name: str, sdk_name: str, *args: str) -> str:
         return result.stdout
     except subprocess.CalledProcessError as e:
         raise Exception(f"Failed to run {tool_name} with SDK {sdk_name}: {e.stderr}")
+
+@mcp.tool()
+async def xctrace_devices() -> List[Dict]:
+    """List available devices for tracing using xctrace."""
+    return xctrace_list_devices()
+
+@mcp.tool()
+async def xctrace_templates() -> List[Dict]:
+    """List available templates for tracing using xctrace."""
+    return list_templates()
+
+@mcp.tool()
+async def xctrace_record(template: str, device_id: str, app_bundle_id: str, 
+                      output_path: str, time_limit: Optional[int] = None) -> str:
+    """Record app performance using xctrace.
+    
+    Args:
+        template: Name of the template to use
+        device_id: UDID of the target device
+        app_bundle_id: Bundle ID of the app to record
+        output_path: Path to save the trace file
+        time_limit: Optional recording time limit in seconds
+    """
+    record(template, device_id, app_bundle_id, output_path, time_limit)
+    return f"Successfully recorded trace to {output_path}"
+
+@mcp.tool()
+async def xctrace_export(trace_path: str, output_path: str, type: str = "json") -> str:
+    """Export trace data to specified format.
+    
+    Args:
+        trace_path: Path to the trace file
+        output_path: Path to save the exported data
+        type: Export format (json, html, etc.)
+    """
+    export(trace_path, output_path, type)
+    return f"Successfully exported trace to {output_path}"
 
 if __name__ == "__main__":
     mcp.run(transport='stdio')
