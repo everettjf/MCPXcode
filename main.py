@@ -1,9 +1,16 @@
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 from mcp.server.fastmcp import FastMCP
 import json
 import subprocess
+# xctrace导入
 from xctrace import list_devices as xctrace_list_devices
 from xctrace import list_templates, record, export
+from xctrace import record_with_options, attach, diagnose_archive
+from xctrace import document_template, analyze_trace, compare_traces
+# xcrun导入
+from xcrun import xcodebuild_list_sdks, xcodebuild_list_schemes, xcodebuild_build
+from xcrun import altool_validate_app, altool_upload_app
+from xcrun import swift_symbols, otool_headers, otool_libraries, nm_symbols
 mcp = FastMCP("MCPXcode")
 
 @mcp.tool()
@@ -253,6 +260,193 @@ async def xctrace_export(trace_path: str, output_path: str, type: str = "json") 
     """
     export(trace_path, output_path, type)
     return f"Successfully exported trace to {output_path}"
+
+
+@mcp.tool()
+async def xctrace_record_advanced(template: str, device_id: str, app_bundle_id: str, 
+                      output_path: str, time_limit: Optional[int] = None,
+                      template_options: Optional[Dict[str, str]] = None,
+                      launch_args: Optional[List[str]] = None,
+                      env_vars: Optional[Dict[str, str]] = None) -> str:
+    """Advanced record with additional options for template, launch args, and env vars.
+    
+    Args:
+        template: Name of the template to use
+        device_id: UDID of the target device
+        app_bundle_id: Bundle ID of the app to record
+        output_path: Path to save the trace file
+        time_limit: Optional recording time limit in seconds
+        template_options: Optional template-specific options
+        launch_args: Optional launch arguments for the app
+        env_vars: Optional environment variables for the app
+    """
+    record_with_options(template, device_id, app_bundle_id, output_path, time_limit,
+                       template_options, launch_args, env_vars)
+    return f"Successfully recorded trace to {output_path}"
+
+
+@mcp.tool()
+async def xctrace_attach_process(pid: int, template: str, output_path: str, 
+                              time_limit: Optional[int] = None) -> str:
+    """Attach to a running process for tracing.
+    
+    Args:
+        pid: Process ID to attach to
+        template: Name of the template to use
+        output_path: Path to save the trace file
+        time_limit: Optional recording time limit in seconds
+    """
+    attach(pid, template, output_path, time_limit)
+    return f"Successfully attached tracer to process {pid} and saved trace to {output_path}"
+
+
+@mcp.tool()
+async def xctrace_diagnose(archive_path: str, output_dir: str) -> str:
+    """Diagnose a trace archive.
+    
+    Args:
+        archive_path: Path to the trace archive
+        output_dir: Directory to save the diagnosis results
+    """
+    diagnose_archive(archive_path, output_dir)
+    return f"Successfully diagnosed archive and saved results to {output_dir}"
+
+
+@mcp.tool()
+async def xctrace_document(template: str, output_path: str) -> str:
+    """Generate documentation for a template.
+    
+    Args:
+        template: Name of the template to document
+        output_path: Path to save the documentation
+    """
+    document_template(template, output_path)
+    return f"Successfully generated documentation for template {template} to {output_path}"
+
+
+@mcp.tool()
+async def xctrace_analyze(trace_path: str, output_dir: str) -> str:
+    """Analyze a trace file and generate performance reports.
+    
+    Args:
+        trace_path: Path to the trace file
+        output_dir: Directory to save analysis reports
+    """
+    analyze_trace(trace_path, output_dir)
+    return f"Successfully analyzed trace and saved reports to {output_dir}"
+
+
+@mcp.tool()
+async def xctrace_compare(base_trace: str, comparison_trace: str, output_path: str) -> str:
+    """Compare two trace files and generate a comparison report.
+    
+    Args:
+        base_trace: Path to the base trace file
+        comparison_trace: Path to the comparison trace file
+        output_path: Path to save the comparison report
+    """
+    compare_traces(base_trace, comparison_trace, output_path)
+    return f"Successfully compared traces and saved report to {output_path}"
+
+
+# xcrun工具命令
+@mcp.tool()
+async def xcrun_list_sdks() -> List[Dict]:
+    """List all available SDKs."""
+    return xcodebuild_list_sdks()
+
+
+@mcp.tool()
+async def xcrun_list_schemes(project_path: str) -> List[str]:
+    """List all schemes in a project.
+    
+    Args:
+        project_path: Path to .xcodeproj or .xcworkspace
+    """
+    return xcodebuild_list_schemes(project_path)
+
+
+@mcp.tool()
+async def xcrun_build(project_path: str, scheme: str, configuration: str = "Debug", 
+                   sdk: str = "iphonesimulator", destination: Optional[str] = None) -> str:
+    """Build an Xcode project.
+    
+    Args:
+        project_path: Path to .xcodeproj or .xcworkspace
+        scheme: Scheme to build
+        configuration: Build configuration (Debug, Release)
+        sdk: SDK to build for
+        destination: Optional destination specifier (e.g. 'platform=iOS Simulator,name=iPhone 14')
+    """
+    result = xcodebuild_build(project_path, scheme, configuration, sdk, destination)
+    return f"Build completed:\n{result}"
+
+
+@mcp.tool()
+async def xcrun_validate_app(app_path: str, username: str, password_keychain_item: str) -> str:
+    """Validate an app before submission to App Store.
+    
+    Args:
+        app_path: Path to .ipa file
+        username: App Store Connect username
+        password_keychain_item: Keychain item containing password
+    """
+    result = altool_validate_app(app_path, username, password_keychain_item)
+    return f"App validation completed:\n{result}"
+
+
+@mcp.tool()
+async def xcrun_upload_app(app_path: str, username: str, password_keychain_item: str) -> str:
+    """Upload an app to App Store.
+    
+    Args:
+        app_path: Path to .ipa file
+        username: App Store Connect username
+        password_keychain_item: Keychain item containing password
+    """
+    result = altool_upload_app(app_path, username, password_keychain_item)
+    return f"App upload completed:\n{result}"
+
+
+@mcp.tool()
+async def xcrun_swift_symbols(binary_path: str) -> List[str]:
+    """Extract Swift symbols from a binary.
+    
+    Args:
+        binary_path: Path to binary file
+    """
+    return swift_symbols(binary_path)
+
+
+@mcp.tool()
+async def xcrun_otool_headers(binary_path: str) -> List[str]:
+    """Show Mach-O headers of a binary.
+    
+    Args:
+        binary_path: Path to binary file
+    """
+    return otool_headers(binary_path)
+
+
+@mcp.tool()
+async def xcrun_otool_libraries(binary_path: str) -> List[str]:
+    """Show linked libraries of a binary.
+    
+    Args:
+        binary_path: Path to binary file
+    """
+    return otool_libraries(binary_path)
+
+
+@mcp.tool()
+async def xcrun_nm_symbols(binary_path: str) -> List[str]:
+    """Show symbols in a binary.
+    
+    Args:
+        binary_path: Path to binary file
+    """
+    return nm_symbols(binary_path)
+
 
 if __name__ == "__main__":
     mcp.run(transport='stdio')
