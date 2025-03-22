@@ -132,20 +132,6 @@ uv add "mcp[cli]"
 | `xctrace_analyze` | Analyze a trace file and generate performance reports | "Generate performance reports from my time profiler trace file." |
 | `xctrace_compare` | Compare two trace files and generate a comparison report | "Compare the performance between trace files from version 1.0 and version 2.0 of my app." |
 
-## Usage
-
-### MCP CLI Interface
-
-```bash
-# Start the MCP server with default settings
-mcpxcode serve
-
-# Execute an xcrun tool with context
-mcpxcode tool xcrun simctl list --format json
-
-# Execute an xctrace tool with context
-mcpxcode tool xctrace record --template 'Time Profiler' --launch com.example.app
-```
 
 ## Project Roadmap
 
